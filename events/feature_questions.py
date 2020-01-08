@@ -10,6 +10,7 @@ Client = SlackClient(SLACK_BOT_USER_TOKEN)
 
 def create_questions(request):
     slack_message = request.data
+
     if slack_message.get('token') != SLACK_VERIFICATION_TOKEN:
         return Response(status=status.HTTP_403_FORBIDDEN)
     # verification challenge
@@ -27,7 +28,7 @@ def create_questions(request):
         user = event_message.get('user')
         text = event_message.get('text')
         channel = event_message.get('channel')
-        bot_text = 'wassup! this is new hire bot speaking'.format(user)
+        bot_text = 'wassup! this is question bot speaking'.format(user)
         if 'hi' in text.lower():
             Client.api_call(method='chat.postMessage',
                             channel=channel,

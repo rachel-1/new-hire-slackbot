@@ -27,5 +27,5 @@ from events.views import Events
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('events/', Events.as_view()),
+    path('events/', Events.as_view())
 ]
