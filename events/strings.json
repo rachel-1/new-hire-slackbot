@@ -1,0 +1,6 @@
+{
+  "greeting_string":
+    "Hello! I am NewHireBot, and I'm here to help you with your new hire needs",
+  "manager_inquiry":
+    "Are you a new hire? If so, name your manager. Otherwise, feel free to ignore me."
+}
