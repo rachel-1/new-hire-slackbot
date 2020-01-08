@@ -1,4 +1,4 @@
-from events.feature_questions import create_questions
+from events.feature_greet import send_greeting_message
 
 from django.conf import settings
 from django.shortcuts import render
@@ -12,10 +12,10 @@ class Events(APIView):
         '''
         from events.models import User
         from datetime import date
-        user1 = User(username="rachel0", slack_user_id="URY87UWUS", join_date=date.today())  # create a ToDoList 
+        user1 = User(username="rachel0", slack_user_id="URY87UWUS", join_date=date.today())  # create a ToDoList
         user1.save()  # saves the ToDoList in the database
 
         print(user1.id)  # prints 1, each list is given an id automatically
         print(User.objects.all())  # prints all of the ToDoLists in the database
         '''
-        return create_questions(request)
+        return send_greeting_message(request)
