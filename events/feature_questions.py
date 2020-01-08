@@ -30,9 +30,25 @@ def create_questions(request):
         channel = event_message.get('channel')
         bot_text = 'wassup! this is question bot speaking'.format(user)
         if 'hi' in text.lower():
-            Client.api_call(method='chat.postMessage',
-                            channel=channel,
-                            text=bot_text)
+
+            from apscheduler.schedulers.background import BackgroundScheduler
+
+            from django_apscheduler.jobstores import DjangoJobStore, register_events, register_job
+
+            scheduler = BackgroundScheduler()
+            scheduler.add_jobstore(DjangoJobStore(), "default")
+            from events.text_user import send_prof_dev_info
+            #scheduler.add_job(test_job, 'calendarinterval', months=1, hour=15, minute=36)
+
+            scheduler.add_job(send_prof_dev_info, 'interval',
+                              args=[user], seconds=2, max_instances=2, replace_existing=True)
+
+            scheduler.start()
+            print("Scheduler started!")
+            
+            #Client.api_call(method='chat.postMessage',
+            #                channel=channel,
+            #                text=bot_text)
             return Response(status=status.HTTP_200_OK)
 
     return Response(status=status.HTTP_200_OK)

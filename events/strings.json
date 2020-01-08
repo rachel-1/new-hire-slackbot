@@ -1,6 +1,39 @@
 {
-  "greeting_string":
-    "Hello! I am NewHireBot, and I'm here to help you with your new hire needs",
-  "manager_inquiry":
-    "Are you a new hire? If so, name your manager. Otherwise, feel free to ignore me."
+    "greeting_string": "Hello! I am NewHireBot, and I'm here to help you with your new hire needs",
+    "manager_inquiry": "Are you an intern? If so, name your manager. Otherwise, feel free to ignore me.",
+    "professional_development":
+    {
+	"0": 
+	{"intern":
+	 {
+	     "description": "The most common mistake interns make is not asking enough questions. Learn how to ask questions the right way.", 
+	     "link": "https://evykassirer.github.io/playing-the-internship-game/4-At-The-Internship/asking_questions/",
+	     "action": "Write down 3 questions you have right now in your #questions channel. They could be anything from how to set up your work laptop to whether you should go to grad school. In the next week, ask your mentor at least these three questions."
+	     
+	 },
+	 "manager":
+	 {
+	     
+	     "description": "The most common failure mode for new hires is not asking enough questions. Here's how to be more approachable.",
+	     "link": "https://www.inc.com/robin-camarote/the-best-leaders-know-these-6-tricks-to-being-more-approachable.html",
+	     "action": "Find some time to check in on your intern and set up an avenue for them to ask questions (of anyone who might be relevant)."
+	 }
+	},
+	"1": 
+	{"new_hire":
+	 {
+	     "description": "Any internship is a great opportunity to learn from those around you, especially those not in your same team or role.",
+	     "link": "https://www.careercontessa.com/advice/questions-to-ask-informational-interview/",
+	     "action": "Maybe write down 3-5 of your favorite questions, and have your manager introduce you to someone within the company who could be a good connection for you."
+	     
+	 },
+	 "manager":
+	 {
+	     "description": "A crucial part of whether interns decide to come back for full-time roles is the mentorship experience. Here's how to do better.",
+	     "link": "https://www.themuse.com/advice/6-ways-to-be-a-great-boss-to-your-intern",
+	     "action": "Your intern was instructed to ask any questions they have, but if that didn't end up happening, maybe check in on the intern again and reaffirm your committment to helping them learn."
+	 }
+	}
+    }
+    
 }
