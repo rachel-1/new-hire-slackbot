@@ -3,6 +3,10 @@
     "Hello! I am NewHireBot, and I'm here to help you with your new hire needs",
   "manager_inquiry":
     "Are you an intern? If so, name your manager. Otherwise, feel free to ignore me.",
+  "goal_setting": {
+      "intro": "What are your professional goals for this internship? It's easy to get caught up in day-to-day tasks and forget what you came for. Reply in this thread with your goals and I'll remind you about them once a month.",
+      "examples": "Here are some suggestions:\nGetting better at a skill (e.g. industry C++, product management, etc.)\nFinishing a project you can talk about in future job interviews (e.g. finishing one big task you are allowed to talk about)\nExpand your professional network (e.g. add people on LinkedIn, find a mentor you can follow up with after the internship etc.)\nLearning about an industry (e.g. understanding what different roles in a self-driving car company look like)",
+  },
   "professional_development": {
     "0": {
       "intern": {
@@ -23,7 +27,7 @@
       }
     },
     "1": {
-      "new_hire": {
+      "intern": {
         "description":
           "Any internship is a great opportunity to learn from those around you, especially those not in your same team or role.",
         "link":
