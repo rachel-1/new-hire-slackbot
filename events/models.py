@@ -4,7 +4,12 @@ class User(models.Model):
     slack_user_id = models.CharField(max_length=50)
     slack_team_id = models.CharField(max_length=50)
     username = models.CharField(max_length=300)
+    real_name = models.CharField(max_length=300)
     join_date = models.DateTimeField()
+    bot_dm_id = models.CharField(max_length=50)
+    manager_id = models.CharField(max_length=50)
+    manager_name = models.CharField(max_length=300)
+    greet_stage = models.PositiveSmallIntegerField()
 
 class Question(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE)
@@ -22,6 +27,3 @@ class Answer(models.Model):
 
     def __str__(self):
         return self.text
-
-
-
