@@ -14,7 +14,7 @@ class User(models.Model):
     manager_id = models.CharField(max_length=50)
     manager_name = models.CharField(max_length=300)
     greet_stage = models.PositiveSmallIntegerField()
-    prof_dev_stage = models.PositiveSmallIntegerField()
+    prof_dev_stage = models.PositiveSmallIntegerField(default=0)
     prof_dev_channel = models.CharField(max_length=50)
     manager_prof_dev_channel = models.CharField(max_length=50)
     goals_thread = models.CharField(max_length=50)

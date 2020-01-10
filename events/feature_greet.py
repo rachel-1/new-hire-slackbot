@@ -12,12 +12,10 @@ SLACK_BOT_USER_TOKEN = getattr(settings,
 Client = SlackClient(SLACK_BOT_USER_TOKEN)
 
 # Is run when event is team_join
-def send_greeting_message(request):
+def send_greeting_message(event_message):
     all_strings = {}
     with open('events/strings.json') as json_file:
         all_strings = json.load(json_file)
-    slack_message = request.data
-    event_message = slack_message.get('event')
     user_id = event_message['user']['id']
     user_real_name = event_message['user']['real_name']
     team_id = event_message['user']['team_id']
@@ -45,40 +43,38 @@ def send_greeting_message(request):
     return Response(status=status.HTTP_200_OK)
 
 # TODO: need to specify when this is run in views.py
-def get_manager(request):
+def get_manager(event_message):
     all_strings = {}
     with open('events/strings.json') as json_file:
         all_strings = json.load(json_file)
-    slack_message = request.data
-    event_message = slack_message.get('event')
-    if event_message['type'] == 'message':
-        # Check if the sender is a new hire in stage of no manager yet
-        if User.objects.filter(slack_user_id=event_message['user']).exists() and \
-            User.objects.get(slack_user_id=event_message['user']).greet_stage == 1:
-            this_user = User.objects.get(slack_user_id=event_message['user'])
-            manager_name = event_message['text']
-            manager_id = find_id_from_name(manager_name)
-            if len(manager_id) == 0:
-                # Manager not found
-                Client.api_call(method='chat.postMessage',
-                            channel=this_user.bot_dm_id,
-                            text=all_strings['greeting']['manager_retry'])
-            else:
-                Client.api_call(method='chat.postMessage',
-                            channel=this_user.bot_dm_id,
-                            text=all_strings['greeting']['manager_successful'])
-                this_user.manager_name = manager_name
-                this_user.manager_id = manager_id
-                this_user.greet_stage = 2
-                this_user.save()
-                Client.api_call(method='chat.postMessage',
-                            channel=this_user.bot_dm_id,
-                            text=all_strings['greeting']['meet_greet'])
-                first_name = this_user.real_name.split()[0]
-                Client.api_call(method='chat.postMessage',
-                            channel=this_user.bot_dm_id,
-                            text=all_strings['greeting']['intro_channels'].format(first_name, first_name, first_name))
-                create_user_channels(this_user.slack_user_id, first_name, all_strings)
+    # if event_message['type'] == 'message':
+    # Check if the sender is a new hire in stage of no manager yet
+    if User.objects.filter(slack_user_id=event_message['user']).exists() and \
+        User.objects.get(slack_user_id=event_message['user']).greet_stage == 1:
+        this_user = User.objects.get(slack_user_id=event_message['user'])
+        manager_name = event_message['text']
+        manager_id = find_id_from_name(manager_name)
+        if len(manager_id) == 0:
+            # Manager not found
+            Client.api_call(method='chat.postMessage',
+                        channel=this_user.bot_dm_id,
+                        text=all_strings['greeting']['manager_retry'])
+        else:
+            Client.api_call(method='chat.postMessage',
+                        channel=this_user.bot_dm_id,
+                        text=all_strings['greeting']['manager_successful'])
+            this_user.manager_name = manager_name
+            this_user.manager_id = manager_id
+            this_user.greet_stage = 2
+            this_user.save()
+            Client.api_call(method='chat.postMessage',
+                        channel=this_user.bot_dm_id,
+                        text=all_strings['greeting']['meet_greet'])
+            first_name = this_user.real_name.split()[0]
+            Client.api_call(method='chat.postMessage',
+                        channel=this_user.bot_dm_id,
+                        text=all_strings['greeting']['intro_channels'].format(first_name, first_name, first_name))
+            create_user_channels(this_user.slack_user_id, first_name, all_strings)
     return Response(status=status.HTTP_200_OK)
 
 def find_id_from_name(name):
@@ -104,13 +100,13 @@ def find_id_from_name(name):
 
 def create_user_channels(user_id, first_name, all_strings):
     this_user = User.objects.get(slack_user_id=user_id)
-    prodev = Client.api_call(method='conversations.create',
-                name='{}-prodev'.format(first_name),
+    prof_dev = Client.api_call(method='conversations.create',
+                name='{}-pro-dev'.format(first_name),
                 is_private=True)
-    if 'channel' in prodev:
+    if 'channel' in prof_dev:
         # Channel with same name doesn't already exist
         Client.api_call(method='conversations.invite',
-                channel=prodev['channel']['id'],
+                channel=prof_dev['channel']['id'],
                 users=user_id)
         progress = Client.api_call(method='conversations.create',
                     name='{}-progress'.format(first_name),
@@ -128,7 +124,7 @@ def create_user_channels(user_id, first_name, all_strings):
         Client.api_call(method='chat.postMessage',
                     channel=questions['channel']['id'],
                     text=all_strings['questions']['introduction'])
-        this_user.prodev_channel_id = prodev['channel']['id']
-        this_user.progress_channel_id = progress['channel']['id']
-        this_user.questions_channel_id = questions['channel']['id']
+        this_user.prof_dev_channel = prof_dev['channel']['id']
+        this_user.progress_channel = progress['channel']['id']
+        this_user.questions_channel = questions['channel']['id']
         this_user.save()

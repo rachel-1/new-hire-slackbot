@@ -24,7 +24,8 @@ class Events(APIView):
         self.scheduler.start()
 
     def post(self, request, *args, **kwargs):
-        print("request: ", request.META) # TODO - remove debug statement
+        # print("request: ", request.META) # TODO - remove debug statement
+        print("IN POST")
         if False:
             from events.models import User
             from datetime import date
@@ -60,7 +61,4 @@ class Events(APIView):
         self.scheduler.add_job(process_event, 'date',
                                run_date=datetime.datetime.now(),
                                args=[self.scheduler, slack_message])
-        # # Response to events
-        # TO ADD: get_manager(request)
-        # send_greeting_message(request)
         return Response(status=status.HTTP_200_OK)
