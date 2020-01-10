@@ -1,0 +1,5 @@
+{
+    "daily_goal_prompt": "What do you hope to get finished today?",
+    "daily_progress_prompt": "What did you end up getting done? If you have things you are still stuck on, consider adding them to your personal questions channel so you remember where you left off.",
+    "q_nudge": "You seem to have been stuck on the same thing for a little while. Why don't you ask for help? Don't be nervous! An internship is not a test; in fact, your manager would rather you take a few minutes of their time to save yourself a few days since the project as a whole will benefit."
+}

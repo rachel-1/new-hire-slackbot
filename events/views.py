@@ -1,35 +1,66 @@
-from events.feature_greet import send_greeting_message, get_manager
-
 from django.conf import settings
 from django.shortcuts import render
 from rest_framework.views import APIView
+
 from rest_framework.response import Response
 from rest_framework import status
-from slackclient import SlackClient
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from django_apscheduler.jobstores import DjangoJobStore, register_events, register_job
+
+from events.event_processing import process_event
+import datetime
 
 SLACK_VERIFICATION_TOKEN = getattr(settings, 'SLACK_VERIFICATION_TOKEN', None)
 
 class Events(APIView):
-    def post(self, request, *args, **kwargs):
-        '''
-        from events.models import User
-        from datetime import date
-        user1 = User(username="rachel0", slack_user_id="URY87UWUS", join_date=date.today())  # create a ToDoList
-        user1.save()  # saves the ToDoList in the database
+    def __init__(self):
+        super(Events).__init__()
+        self.scheduler = BackgroundScheduler(
+        {'apscheduler.executors.default': {
+            'type': 'threadpool',
+            'max_workers': '1'}
+        })
+        self.scheduler.start()
 
-        print(user1.id)  # prints 1, each list is given an id automatically
-        print(User.objects.all())  # prints all of the ToDoLists in the database
-        '''
-        # Slack sends post request on verification challenge and
-        # also events that we detect for
+    def post(self, request, *args, **kwargs):
+        print("request: ", request.META) # TODO - remove debug statement
+        if False:
+            from events.models import User
+            from datetime import date
+            user1 = User(username="rachel0",
+                         slack_user_id="URY87UWUS",
+                         slack_team_id="",
+                         real_name="Rachel Gardner",
+                         bot_dm_id="",
+                         manager_id="",
+                         manager_name="",
+                         prof_dev_channel="GSGG2KC7J",
+                         manager_prof_dev_channel="GSJNAFJNS",
+                         progress_channel="GSGHZMKG8",
+                         greet_stage=0,
+                         prof_dev_stage=0,
+                         join_date=date.today())
+            user1.save()
+
         slack_message = request.data
+
         if slack_message.get('token') != SLACK_VERIFICATION_TOKEN:
             return Response(status=status.HTTP_403_FORBIDDEN)
+
         # Verification challenge
         if slack_message.get('type') == 'url_verification':
             return Response(data=slack_message,
                             status=status.HTTP_200_OK)
-        # Response to events
-        get_manager(request)
-        send_greeting_message(request)
+
+        # ignore messages from the bot
+        if slack_message['event'].get('subtype') == 'bot_message':
+            return Response(status=status.HTTP_200_OK)
+
+        self.scheduler.add_job(process_event, 'date',
+                               run_date=datetime.datetime.now(),
+                               args=[self.scheduler, slack_message])
+        # # Response to events
+        # TO ADD: get_manager(request)
+        # send_greeting_message(request)
         return Response(status=status.HTTP_200_OK)
