@@ -10,14 +10,20 @@ trigger | resulting state     | action on user input
 5pm     | (3)'asked_progress' | ignore input, go to (1)
 """
 
+import datetime
+
 with open("events/progress_strings.json") as f:
     all_strings = json.load(f)
 
-def progress_channel_handler(user, slack_message):
+def progress_channel_handler(scheduler, user, slack_message):
     """
     Handle user messages in their personal progress channel.
     """
     if user.progress_prompt_state == 'sleep':
+        next_time = datetime.datetime.now() + datetime.timedelta(seconds=20)
+        scheduler.add_job(ask_daily_goal, 'date',
+                          run_date=next_time,
+                          args=[scheduler, user_id])
         pass # weren't expecting anything from user
     elif user.progress_prompt_state == 'asked_goal':
         if slack_message['text'].tolower() != 'same':
@@ -34,12 +40,12 @@ def progress_channel_handler(user, slack_message):
         # not currently saving this data; just for user to see
         user.progress_prompt_state = 'sleep'
     else:
-        throw Exception("Unknown state '{}' in progress state machine".format(user.progress_prompt_state))
+        raise Exception("Unknown state '{}' in progress state machine".format(user.progress_prompt_state))
 
-def ask_daily_goal(user_id):
+def ask_daily_goal(scheduler, user_id):
     user = User.objects.get(slack_user_id=user_id)
     
-        bot_text = all_strings['daily_goal_prompt']
+    bot_text = all_strings['daily_goal_prompt']
     
     result = Client.api_call(method='chat.postMessage',
                     channel=user.progress_channel,
@@ -48,7 +54,12 @@ def ask_daily_goal(user_id):
     user.progress_prompt_state = 'asked_goal'
     user.save()
 
-def ask_daily_progress(user_id):
+    next_time = datetime.datetime.now() + datetime.timedelta(seconds=20)
+    scheduler.add_job(ask_daily_progress, 'date',
+                      run_date=next_time,
+                      args=[scheduler, user_id])
+
+def ask_daily_progress(scheduler, user_id):
     user = User.objects.get(slack_user_id=user_id)
     
     bot_text = all_strings['daily_progress_prompt']
@@ -59,3 +70,9 @@ def ask_daily_progress(user_id):
 
     user.progress_prompt_state = 'asked_progress'
     user.save()
+
+    next_time = datetime.datetime.now() + datetime.timedelta(seconds=20)
+    scheduler.add_job(ask_daily_goal, 'date',
+                      run_date=next_time,
+                      args=[scheduler, user_id])
+

@@ -37,6 +37,7 @@ class Events(APIView):
                          manager_name="",
                          prof_dev_channel="GSGG2KC7J",
                          manager_prof_dev_channel="GSJNAFJNS",
+                         progress_channel="GSGHZMKG8",
                          greet_stage=0,
                          prof_dev_stage=0,
                          join_date=date.today())

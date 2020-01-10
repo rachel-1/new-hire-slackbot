@@ -24,6 +24,9 @@ class User(models.Model):
     progress_prompt_state = models.CharField(max_length=50, default='sleep')
     current_goal = models.CharField(max_length=50)
     days_stuck = models.PositiveSmallIntegerField(default=0)
+
+    # questions
+    questions_channel = models.CharField(max_length=50)
     
 class Question(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE)

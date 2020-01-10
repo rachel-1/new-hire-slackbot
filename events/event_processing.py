@@ -13,8 +13,8 @@ def process_event(scheduler, slack_message):
         user = User.objects.get(slack_user_id=user_id)
 
         if event['channel'] == user.progress_channel:
-            from progress_features import progress_channel_handler
-            progress_channel_handler(user, slack_message)
+            from events.progress_features import progress_channel_handler
+            progress_channel_handler(scheduler, user, slack_message)
 
         elif event['channel'] == user.prof_dev_channel:
             # TODO - should happen when person first joins
