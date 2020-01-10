@@ -9,11 +9,6 @@ SLACK_BOT_USER_TOKEN = getattr(settings, 'SLACK_BOT_USER_TOKEN', None)
 Client = SlackClient(SLACK_BOT_USER_TOKEN)
     
 def get_goals(user_id):
-    result = Client.api_call(method='chat.postMessage',
-                             channel="GSGG2KC7J",
-                             #channel=user.prof_dev_channel,
-                             text='test')
-    return
     user = User.objects.get(slack_user_id=user_id)
     
     with open("events/strings.json") as f:
