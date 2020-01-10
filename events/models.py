@@ -10,6 +10,9 @@ class User(models.Model):
     manager_id = models.CharField(max_length=50)
     manager_name = models.CharField(max_length=300)
     greet_stage = models.PositiveSmallIntegerField()
+    prodev_channel_id = models.CharField(max_length=50)
+    progress_channel_id = models.CharField(max_length=50)
+    questions_channel_id = models.CharField(max_length=50)
 
 class Question(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.CASCADE)

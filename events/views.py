@@ -20,6 +20,8 @@ class Events(APIView):
         print(user1.id)  # prints 1, each list is given an id automatically
         print(User.objects.all())  # prints all of the ToDoLists in the database
         '''
+        # Slack sends post request on verification challenge and
+        # also events that we detect for
         slack_message = request.data
         if slack_message.get('token') != SLACK_VERIFICATION_TOKEN:
             return Response(status=status.HTTP_403_FORBIDDEN)
@@ -27,6 +29,7 @@ class Events(APIView):
         if slack_message.get('type') == 'url_verification':
             return Response(data=slack_message,
                             status=status.HTTP_200_OK)
+        # Response to events
         get_manager(request)
         send_greeting_message(request)
         return Response(status=status.HTTP_200_OK)

@@ -11,87 +11,124 @@ SLACK_BOT_USER_TOKEN = getattr(settings,
                                'SLACK_BOT_USER_TOKEN', None)
 Client = SlackClient(SLACK_BOT_USER_TOKEN)
 
-# TODO: If you are newly added to the workspace with bot installed,
-# the bot will ask you: are you a new hire? And who is your manager
-
-
+# Is run when event is team_join
 def send_greeting_message(request):
     all_strings = {}
     with open('events/strings.json') as json_file:
         all_strings = json.load(json_file)
     slack_message = request.data
-
-    # Check if event is that a new member was added to the workspace
-    # and if so, greet user
-
-    # This code is only used for dev. So I don't have to add a new user
-    # every time I want to test. Commented block below will get this stuff replaced in later.
     event_message = slack_message.get('event')
-    print('EVENT_MESSAGE is:', event_message)
+    user_id = event_message['user']['id']
+    user_real_name = event_message['user']['real_name']
+    team_id = event_message['user']['team_id']
+    user_display_name = event_message['user']['profile']['display_name']
     conversation_open = Client.api_call(method='conversations.open',
-                                            users='USCT3P11D',
+                                            users=user_id,
                                             return_im=True)
     user_bot_dm_id = conversation_open['channel']['id']
     if not User.objects.filter(bot_dm_id=user_bot_dm_id).exists():
-        new_user = User(slack_user_id=event_message['user'],
-                        slack_team_id='team_id',
-                        username='kelseysdisplayname',
-                        real_name='kelseysrealname',
+        # Bot has never chatted with this new teammate before
+        new_user = User(slack_user_id=user_id,
+                        slack_team_id=team_id,
+                        username=user_display_name,
+                        real_name=user_real_name,
                         join_date=date.today(),
                         bot_dm_id=user_bot_dm_id,
                         greet_stage=1)
         new_user.save()
         Client.api_call(method='chat.postMessage',
                         channel=user_bot_dm_id,
-                        text='who is your manager?')
-
-#     user_bot_dm_id = conversation_open['channel']['id']
-    # if event_message['type'] == 'team_join':
-    #     user_id = event_message['user']['id']
-    #     user_real_name = event_message['user']['real_name']
-    #     team_id = event_message['user']['team']
-    #     user_display_name = event_message['user']['profile']['display_name']
-    #     print("TEAM JOINED")
-    #     print("user_real_name", user_real_name)
-    #     # channel = event_message.get('channel')
-    #     bot_text = all_strings['greeting_string'].format(user_real_name)
-    #     conversation_open = Client.api_call(method='conversations.open',
-    #                                             users=user_id,
-    #                                             text=bot_text,
-    #                                             return_im=True)
-    #     user_bot_dm_id = conversation_open['channel']['id']
-    #     #TODO: check if conversation_open returns anything
-    #     print("USER BOT DM ID", user_bot_dm_id)
-    #     new_user = User(slack_user_id=user_id,
-    #                     slack_team_id=team_id,
-    #                     username=user_display_name,
-    #                     real_name=user_real_name,
-    #                     join_date=date.today(),
-    #                     bot_dm_id=user_bot_dm_id
-    #                     greet_stage=1)
-    #     new_user.save()
-    #     Client.api_call(method='chat.postMessage',
-    #                     channel=user_bot_dm_id,
-    #                     text=bot_text)
-    #     return Response(status=status.HTTP_200_OK)
+                        text=all_strings['greeting']['greeting_string'].format(user_display_name))
+        Client.api_call(method='chat.postMessage',
+                        channel=user_bot_dm_id,
+                        text=all_strings['greeting']['manager_inquiry'])
     return Response(status=status.HTTP_200_OK)
 
+# TODO: need to specify when this is run in views.py
 def get_manager(request):
-    print("in get_manager now ")
+    all_strings = {}
+    with open('events/strings.json') as json_file:
+        all_strings = json.load(json_file)
     slack_message = request.data
     event_message = slack_message.get('event')
-    if event_message is not None:
-        if event_message['type'] == 'message':
-            print("step 1")
-            #get user with event_message['user'] and check if they are in greet stage 1
-            # Check if the sender is a new hire
-            if User.objects.filter(slack_user_id=event_message['user']).exists() and \
-                User.objects.filter(bot_dm_id=event_message['channel']).exists():
-                print("step 2")
+    if event_message['type'] == 'message':
+        # Check if the sender is a new hire in stage of no manager yet
+        if User.objects.filter(slack_user_id=event_message['user']).exists() and \
+            User.objects.get(slack_user_id=event_message['user']).greet_stage == 1:
+            this_user = User.objects.get(slack_user_id=event_message['user'])
+            manager_name = event_message['text']
+            manager_id = find_id_from_name(manager_name)
+            if len(manager_id) == 0:
+                # Manager not found
+                Client.api_call(method='chat.postMessage',
+                            channel=this_user.bot_dm_id,
+                            text=all_strings['greeting']['manager_retry'])
+            else:
+                Client.api_call(method='chat.postMessage',
+                            channel=this_user.bot_dm_id,
+                            text=all_strings['greeting']['manager_successful'])
+                this_user.manager_name = manager_name
+                this_user.manager_id = manager_id
+                this_user.greet_stage = 2
+                this_user.save()
+                Client.api_call(method='chat.postMessage',
+                            channel=this_user.bot_dm_id,
+                            text=all_strings['greeting']['meet_greet'])
+                first_name = this_user.real_name.split()[0]
+                Client.api_call(method='chat.postMessage',
+                            channel=this_user.bot_dm_id,
+                            text=all_strings['greeting']['intro_channels'].format(first_name, first_name, first_name))
+                create_user_channels(this_user.slack_user_id, first_name, all_strings)
+    return Response(status=status.HTTP_200_OK)
 
-                this_user = User.objects.get(slack_user_id=event_message['user'])
-                if this_user.greet_stage == 1:
-                    print("user just said manager is ", event_message['text'])
-                    Client.api_call(method='chat.postMessage',
-                                    channel=this_user.bot_dm_id,
-                                    text="that is your manager?")
+def find_id_from_name(name):
+    all_users = Client.api_call(method='users.list')
+    while True:
+        if not all_users['ok']:
+            break
+        for member_info in all_users['members']:
+            if member_info['is_bot']:
+                continue
+            if 'real_name' in member_info and name.lower() == member_info['real_name'].lower():
+                return member_info['id']
+            if name.lower() == member_info['profile']['real_name'].lower():
+                return member_info['id']
+            if name.lower() == member_info['profile']['display_name'].lower():
+                return member_info['id']
+        next_cursor = all_users['response_metadata']['next_cursor']
+        if len(next_cursor) == 0:
+            # No more
+            break
+        all_users = Client.api_call(method='users.list', cursor=next_cursor)
+    return ""
+
+def create_user_channels(user_id, first_name, all_strings):
+    this_user = User.objects.get(slack_user_id=user_id)
+    prodev = Client.api_call(method='conversations.create',
+                name='{}-prodev'.format(first_name),
+                is_private=True)
+    if 'channel' in prodev:
+        # Channel with same name doesn't already exist
+        Client.api_call(method='conversations.invite',
+                channel=prodev['channel']['id'],
+                users=user_id)
+        progress = Client.api_call(method='conversations.create',
+                    name='{}-progress'.format(first_name),
+                    is_private=True)
+        Client.api_call(method='conversations.invite',
+                channel=progress['channel']['id'],
+                users=user_id)
+        questions = Client.api_call(method='conversations.create',
+                    name='{}-questions'.format(first_name),
+                    is_private=True)
+        Client.api_call(method='conversations.invite',
+                channel=questions['channel']['id'],
+                users=user_id)
+        # Send questions channel introduction message
+        Client.api_call(method='chat.postMessage',
+                    channel=questions['channel']['id'],
+                    text=all_strings['questions']['introduction'])
+        this_user.prodev_channel_id = prodev['channel']['id']
+        this_user.progress_channel_id = progress['channel']['id']
+        this_user.questions_channel_id = questions['channel']['id']
+        this_user.save()
