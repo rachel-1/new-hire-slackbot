@@ -24,7 +24,7 @@ class Events(APIView):
         self.scheduler.start()
     
     def post(self, request, *args, **kwargs):
-        print("request: ", request.META) # TODO - remove debug statement
+
         if False:
             from events.models import User
             from datetime import date
