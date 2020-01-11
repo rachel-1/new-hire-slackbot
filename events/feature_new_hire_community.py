@@ -1,10 +1,13 @@
 import datetime
+import json
+
 from datetime import date
 from datetime import timedelta
 from django.conf import settings
 from slackclient import SlackClient
 
 from events.models import User
+from events.feature_community import pair_members
 
 SLACK_BOT_USER_TOKEN = getattr(settings,
                                'SLACK_BOT_USER_TOKEN', None)
@@ -19,7 +22,7 @@ def create_new_hire_channel(scheduler):
         print("SCHEDULED!!")
         scheduler.add_job(create_channel_and_invite, 'date',
                            run_date=demo_midnight_today,
-                           args=[datetime.datetime.now().strftime('%m-%d-%y')+'-newbies3'])
+                           args=['newbies-'+datetime.datetime.now().strftime('%m-%d-%y')])
 
 def create_channel_and_invite(channel_name):
     # today_midnight = datetime.datetime.combine(date.today(), datetime.datetime.min.time()) - timedelta(days=1)
@@ -44,4 +47,4 @@ def create_channel_and_invite(channel_name):
             Client.api_call(method='conversations.invite',
                     channel=newbies_channel['channel']['id'],
                     users=user.slack_user_id)
-    #TODO: call random matching function on this channel
+        pair_members(newbies_channel['channel']['id'], True)

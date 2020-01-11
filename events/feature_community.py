@@ -6,10 +6,10 @@ import json
 SLACK_BOT_USER_TOKEN = getattr(settings, 'SLACK_BOT_USER_TOKEN', None)
 Client = SlackClient(SLACK_BOT_USER_TOKEN)
 
-def pair_members(channel_id):
+def pair_members(channel_id, is_new_hire):
     result = Client.api_call(method='auth.test')
     bot_user_id = result['user_id']
-    
+
     result = Client.api_call(method='conversations.members',
                              channel=channel_id)
 
@@ -30,15 +30,17 @@ def pair_members(channel_id):
         pairings[-2] += pairings[-1]
         del pairings[-1]
 
+    with open("events/strings.json") as f:
+        all_strings = json.load(f)
+    to_send = all_strings['pair_welcome']
+    if is_new_hire:
+        to_send = all_strings['new_hire_pair_welcome']
     for pair in pairings:
         result = Client.api_call(method='conversations.open',
                         users=','.join(pair))
 
         im_id = result['channel']['id']
 
-        with open("events/strings.json") as f:
-            all_strings = json.load(f)
-
         Client.api_call(method='chat.postMessage',
                         channel=im_id,
-                        text=all_strings['pair_welcome'])
+                        text=to_send)

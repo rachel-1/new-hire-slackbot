@@ -33,7 +33,7 @@ def process_event(scheduler, slack_message):
             #prof_dev_features.setup_articles(scheduler, user_id)
             #time.sleep(5)
             #prof_dev_features.remind_about_goals(user_id)
-            pair_members(user.prof_dev_channel)
+            pair_members(user.prof_dev_channel, False)
 
             #pass # no data is read from the user right now
 

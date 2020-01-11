@@ -1,10 +1,13 @@
 {
   "qs_prompt":
-    "It's been a while since you've posted any questions here...maybe you should add a few?",
-  "pair_welcome": "Congrats! You guys have been paired to meet up this week.",
+    "It's been a while since you've posted any questions here...maybe you should add a few? :thinking_face: Pro-tip: questions can help you summarize what you've learned.",
+  "new_hire_pair_welcome":
+    "Lucky you! You two have been paired to meet up this week as new hire buddies! You could discuss what you're most excited for :bulb:, where you come from :world_map:, or even your favorite scary story :ghost:... set up a time in the next week and get meet n greetin'!",
+  "pair_welcome":
+    "Hey, you two! You've been paired to meet up this week. You could discuss your work here :brain:, your favorite places in the world :earth_africa:, or even your go-to karaoke songs :microphone:... set up a time and get meet n greetin'!",
   "goal_setting": {
     "intro":
-      "What are your professional goals for this internship? It's easy to get caught up in day-to-day tasks and forget what you came for. Reply in this thread with your goals and I'll remind you about them once a month.",
+      "What are your professional goals for this internship? It's easy to get caught up in day-to-day tasks and forget what you came for. Reply in this thread with your goals and I'll remind you about them once a month :spiral_calendar_pad:.",
     "examples":
       "Here are some suggestions:\n- Getting better at a skill (e.g. industry C++, product management, etc.)\n- Finishing a project you can talk about in future job interviews (e.g. finishing one big task you are allowed to talk about)\n- Expand your professional network (e.g. add people on LinkedIn, find a mentor you can follow up with after the internship etc.)\n- Learning about an industry (e.g. understanding what different roles in a self-driving car company look like)"
   },
@@ -12,9 +15,9 @@
     "Here are the goals you have set. Feel free to update them: ",
   "greeting": {
     "greeting_string":
-      "Hi {}! My name is NewHireBot, and it looks like you're a new face here. Welcome to the crew!",
+      "Hi {}! My name is Bungee, and it looks like you're a new face here. Welcome to the crew! :wave:",
     "manager_inquiry":
-      "My very first question: What is your manager's name? I'll be sending helpful resources to both of you.",
+      "Here's my very first question for you: What is your manager's name? I'll be sending helpful resources to both of you.",
     "manager_retry":
       "I didn't find that name in this workspace. Try putting in your manager's full name.",
     "manager_successful": "Got it! :tada:",
@@ -23,7 +26,7 @@
     "intro_channels":
       "And speaking of channels :tv:... I just set up three channels for you: #{}-pro-dev, #{}-progress, and #{}-questions. Each one has a different purpose, but they're all designed to help you make the most out of your time here. Check them out to see what they're about!",
     "only_one_join":
-      "Oops, my bad. You're the only human joining today, so your first Meet n Greet will be with someone else in the company. Will be exciting!"
+      "Oops, my bad. You're the only human joining today, so your first Meet n Greet will be with someone else in the company. Don't worry, it'll be just as helpful, if not more!"
   },
   "questions": {
     "introduction":
