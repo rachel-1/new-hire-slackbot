@@ -21,11 +21,12 @@ class Events(APIView):
             'type': 'threadpool',
             'max_workers': '1'}
         })
+        # TODO - has bug similar to https://github.com/agronholm/apscheduler/issues/305 (though it seems to create a bunch of duplicates instead)
+        #self.scheduler.add_jobstore(DjangoJobStore(), "default")
         self.scheduler.start()
 
     def post(self, request, *args, **kwargs):
-        # print("request: ", request.META) # TODO - remove debug statement
-        print("IN POST")
+        print("request.data: ", request.data) # TODO - remove debug statement
         if False:
             from events.models import User
             from datetime import date
@@ -39,6 +40,7 @@ class Events(APIView):
                          prof_dev_channel="GSGG2KC7J",
                          manager_prof_dev_channel="GSJNAFJNS",
                          progress_channel="GSGHZMKG8",
+                         questions_channel="CS0908BAP",
                          greet_stage=0,
                          prof_dev_stage=0,
                          join_date=date.today())
@@ -63,4 +65,5 @@ class Events(APIView):
         self.scheduler.add_job(process_event, 'date',
                                run_date=datetime.datetime.now(),
                                args=[self.scheduler, slack_message])
+        
         return Response(status=status.HTTP_200_OK)
