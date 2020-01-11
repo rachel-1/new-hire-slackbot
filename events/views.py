@@ -55,7 +55,9 @@ class Events(APIView):
                             status=status.HTTP_200_OK)
 
         # ignore messages from the bot
-        if slack_message['event'].get('subtype') == 'bot_message':
+        if slack_message['event'].get('subtype') == 'bot_message' or \
+            'bot_profile' in slack_message['event']:
+            print("DETECTED IS A BOT")
             return Response(status=status.HTTP_200_OK)
 
         self.scheduler.add_job(process_event, 'date',
