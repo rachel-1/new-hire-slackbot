@@ -3,12 +3,15 @@ from rest_framework.response import Response
 from rest_framework import status
 from events.models import User
 from events.feature_greet import send_greeting_message, get_manager
+from events.feature_new_hire_community import create_new_hire_channel
+
 import datetime
 
 def process_event(scheduler, slack_message):
     event = slack_message['event']
     if event['type'] == 'team_join':
         send_greeting_message(event)
+        create_new_hire_channel(scheduler)
     elif event['type'] == 'message':
         user_id = event['user']
         user = User.objects.get(slack_user_id=user_id)
@@ -41,4 +44,3 @@ def process_event(scheduler, slack_message):
                               run_date=next_time+datetime.timedelta(seconds=10),
                               args=[user_id], id='q_reminder')
             '''
- 

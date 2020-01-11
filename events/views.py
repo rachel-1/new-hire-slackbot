@@ -65,5 +65,4 @@ class Events(APIView):
         self.scheduler.add_job(process_event, 'date',
                                run_date=datetime.datetime.now(),
                                args=[self.scheduler, slack_message])
-        
         return Response(status=status.HTTP_200_OK)
