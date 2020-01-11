@@ -1,5 +1,6 @@
 {
-    "qs_prompt": "It's been a while since you've posted any questions here...maybe you should add a few?",
+  "qs_prompt": "It's been a while since you've posted any questions here...maybe you should add a few?",
+  "pair_welcome": "Congrats! You guys have been paired to meet up this week.",
   "goal_setting": {
     "intro":
       "What are your professional goals for this internship? It's easy to get caught up in day-to-day tasks and forget what you came for. Reply in this thread with your goals and I'll remind you about them once a month.",

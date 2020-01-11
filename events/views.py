@@ -30,6 +30,7 @@ class Events(APIView):
         if False:
             from events.models import User
             from datetime import date
+            '''
             user1 = User(username="rachel0",
                          slack_user_id="URY87UWUS",
                          slack_team_id="",
@@ -44,6 +45,7 @@ class Events(APIView):
                          greet_stage=0,
                          prof_dev_stage=0,
                          join_date=date.today())
+            '''
             user1.save()
 
         slack_message = request.data
